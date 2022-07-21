@@ -1,0 +1,29 @@
+<%- include('../partials/head.ejs') %>
+
+<body>
+    <% if(error){ %>
+        <div class="alert alert-danger">
+            <%= error %>
+        </div>
+    <% } %>
+    <div id="conteudo" class="row">
+        <div class="container mt-5 text-center"><img src="https://themosvagas.com.br/wp-content/uploads/2018/10/JMONTE.jpg" width="13%" alt=""></div>
+        <div class="card position-absolute top-50 start-50 mt-5 translate-middle" style="width: 30rem;">
+            <form class="card-body mt-4" action="/login" method="POST">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Usuário</label>
+                    <input type="text" class="form-control" id="email" aria-describedby="emailHelper" name="usuario" placeholder="Insert your username here!"/>
+                </div>
+                <div class="mb-3">
+                    <label for="senha" class="form-label">Senha</label>
+                    <input type="password" class="form-control" id="senha" aria-describedby="senhaHelper" name="senha" placeholder="Insert your password here!"/>
+                </div>
+                <div class="row">
+                    <button class="col-8 mx-auto btn btn-success mt-4" type="submit" >Fazer Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+</body>
+</html>
