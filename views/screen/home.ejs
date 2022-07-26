@@ -1,35 +1,44 @@
 <%- include('../partials/head.ejs') %>
+<%- include('../partials/nav.ejs') %>
 <body>
+
     <div class="container mt-4">
-        <h1>Bem Vindo, <%= usuario %></h1>
-        <form>
+        <h1>Etapas</h1>
+        <form class="mt-4">
+            <h4>Seletor de Visualização Rápida</h4>
             <select name="vendedor" onchange="userSelect()" id="vendedor" class="form-control mb-4">
                 <option value="0">Selecione uma Opção</option>
                 <% vender.forEach(function(vender){ %>
-                    <option><%= vender.vendedor %></option>
+                    <option><%= vender.nome_vendedor %></option>
                 <% }) %>
             </select>
         </form>
-        <table class="table table-striped table-bor dered" id="table" style="width: 100%">
-            <thead>
-                <tr>
-                    <th class="text-center">Cliente</th>
-                    <th class="text-center">Loja</th>
-                    <th class="text-center">Vendedor</th>
-                    <th class="text-center">Valor</th>
-                </tr>
-            </thead>
-            <tbody id="tbody" class="text-center">
-                <% cliente.forEach(function(cliente){ %>
+        <div class="table-responsive">
+            <table class="table table-striped table-bor dered" id="table" style="width: 100%">
+                <thead>
                     <tr>
-                        <td><%= cliente.cliente == '' ? 'Desconhecido' : cliente.cliente %></td>
-                        <td><%= cliente.loja == '' ? 'Não Informado' : cliente.loja %></td>
-                        <td><%= cliente.vendedor %></td>
-                        <td><%= cliente.valor %></td>
+                        <th class="text-center">Cliente</th>
+                        <th class="text-center">Situação</th>
+                        <th class="text-center">Vendedor</th>
+                        <th class="text-center">Valor</th>
                     </tr>
-                <% }) %>
-            </tbody>
-        </table>
+                </thead>
+                <tbody id="tbody" class="text-center">
+                    <% cliente.forEach(function(cliente){ %>
+                        <tr>
+                            <td><%= cliente.nome_cliente == '' ? 'Desconhecido' : cliente.nome_cliente %></td>
+                            <% if(cliente.sit == 'P'){ %>
+                                <td class="bg-danger">Pendente</td>
+                            <% }else{ %>
+                                <td>Faturado</td>
+                            <% } %>
+                            <td><%= cliente.nome_vendedor %></td>
+                            <td><%= cliente.valor %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
@@ -39,7 +48,9 @@
 
     <script>
         $(document).ready(()=> {
-            $('#table').DataTable();
+            $('#table').DataTable({
+                "info": false
+            });
         })
 
         function userSelect(){
@@ -60,9 +71,9 @@
                         var itens = '';
                         for(let i = 0; response['data'].length > i; i++){
                             itens += "<tr>"
-                            itens += "<td>"+ response['data'][i].cliente +"</td>"
-                            itens += "<td>"+ response['data'][i].loja +"</td>"
-                            itens += "<td>"+ response['data'][i].vendedor +"</td>"
+                            itens += "<td>"+ response['data'][i].nome_cliente +"</td>"
+                            itens += "<td>"+ response['data'][i].sit +"</td>"
+                            itens += "<td>"+ response['data'][i].nome_vendedor +"</td>"
                             itens += "<td>"+ response['data'][i].valor +"</td>"
                             itens += "</tr>"
                         }
@@ -71,6 +82,17 @@
                 })
             }
         }
+
+        var tabela = document.getElementById('tbody')
+        var rows = tabela.getElementsByTagName("tr")
+
+        for(var i = 0; rows.length > i; i++){
+            var row = rows[i]
+            row.addEventListener("click", () => {
+                console.log(this.currentTarget)
+            })
+        }
+
     </script>
 
 </body>
