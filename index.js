@@ -68,7 +68,7 @@ app.post('/login', async (req, res) => {
 })
 
 app.get('/', auth, async (req, res) => {
-    var user = await knex("teste").select()
+    var user = await knex("teste").select().orderBy('nome_cliente', 'ASC').limit(500)
     var vendedordata = await knex("teste").select('nome_vendedor').distinct()
     res.render('screen/home', {usuario: req.session.user, cliente: user, vender: vendedordata})
 })
@@ -88,6 +88,29 @@ app.get('/logout', (req, res) => {
     console.log(user)
     res.render('screen/home', {cliente: user, vender: vendedordata})
 }) */
+
+app.post('/pendencia', async (req, res) => {
+    var { client, sit, vend } = req.body
+
+    console.log(`Cliente: ${client}\nSituação: ${sit}\nVendedor: ${vend}\n`)
+
+    await knex('teste').select().where({nome_cliente: client}).then( async (result) => {
+        for(var k = 0; result.length > k; k++){
+            if(result[k].alert == 'null' || result[k].alert == null){
+                await knex('teste').where({nome_cliente: client}).update({alert: 'pendente'})
+            }else
+            if(result[k].alert == 'pendente'){
+                await knex('teste').where({nome_cliente: client}).update({alert: 'autorizado'})
+            }else
+            if(result[k].alert == 'autorizado'){
+                await knex('teste').where({nome_cliente: client}).update({alert: null})
+            }
+        }
+
+        var att = await knex('teste').select('alert').where({nome_cliente: client})
+        res.json({data: att})
+    })
+})
 
 app.listen(PORT, () =>{
     console.log('Servidor rodando na porta: ' + PORT)

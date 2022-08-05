@@ -2,10 +2,10 @@
 <%- include('../partials/nav.ejs') %>
 <body>
 
-    <div class="container mt-4">
+    <div class="container mt-4 mb-5">
         <h1>Etapas</h1>
         <form class="mt-4">
-            <h4>Seletor de Visualização Rápida</h4>
+            <h4>Seletor de Visualização Rápida Por Vendedor</h4>
             <select name="vendedor" onchange="userSelect()" id="vendedor" class="form-control mb-4">
                 <option value="0">Selecione uma Opção</option>
                 <% vender.forEach(function(vender){ %>
@@ -28,11 +28,17 @@
                         <tr>
                             <td><%= cliente.nome_cliente == '' ? 'Desconhecido' : cliente.nome_cliente %></td>
                             <% if(cliente.sit == 'P'){ %>
-                                <td class="bg-danger">Pendente</td>
+                                <td style="cursor: pointer;">Pendente</td>
                             <% }else{ %>
-                                <td>Faturado</td>
+                                <td style="cursor: pointer;">Faturado</td>
                             <% } %>
-                            <td><%= cliente.nome_vendedor %></td>
+                            <% if(cliente.alert == 'null' || cliente.alert == null){ %>
+                                <td id="nomeClient" class="bg-light"><%= cliente.nome_vendedor %></td>
+                            <% }else if(cliente.alert == 'pendente'){ %>
+                                <td id="nomeClient" class="bg-danger"><%= cliente.nome_vendedor %></td>
+                            <% }else if(cliente.alert == 'autorizado'){ %>
+                                <td id="nomeClient" class="bg-success"><%= cliente.nome_vendedor %></td>
+                            <% } %>
                             <td><%= cliente.valor %></td>
                         </tr>
                     <% }) %>
@@ -40,6 +46,27 @@
             </table>
         </div>
     </div>
+    
+    <div class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Modal title</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>Modal body text goes here.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary">Save changes</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <!-- <div style="width: 100px; height: 100px;" id="ablock" class="bg-success"></div> -->
 
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -83,15 +110,50 @@
             }
         }
 
-        var tabela = document.getElementById('tbody')
-        var rows = tabela.getElementsByTagName("tr")
+        /* var block = document.getElementById('ablock')
+        block.addEventListener('click', () => {
+            if(block.classList == 'bg-success'){
+                block.classList.replace('bg-success', 'bg-danger')
+            }else{
+                block.classList.replace('bg-danger', 'bg-success')
+            }
+        }) */
 
-        for(var i = 0; rows.length > i; i++){
-            var row = rows[i]
-            row.addEventListener("click", () => {
-                console.log(this.currentTarget)
-            })
-        }
+        var tdDanger = document.getElementById('nomeClient')
+        var tabela = document.getElementById('tbody')
+        tabela.addEventListener('click', (result) => {
+
+            var dataInTable = result.srcElement.parentElement.children
+            var res = []
+            for(var i = 0; dataInTable.length > i; i++){
+                console.log(dataInTable[i].textContent)
+                res.push(dataInTable[i].textContent)
+            }
+
+            var teste = confirm(`Você está enviando um alerta para o usuário ${res[2]}! Deseja continuar?`)
+            if(teste == null || teste == ""){
+                return;
+            }else{
+                alert('Dados atualizados!')
+                $.ajax({
+                    method: 'POST',
+                    url: '/pendencia',
+                    data: {
+                        client: res[0],
+                        sit: res[1],
+                        vend: res[2]
+                    },
+                    complete: (xrr) => {
+                        respons = xrr.responseJSON
+                        location.reload();
+                        //var alert = respons['data'][0]['alert']
+                        //console.log('this is return: ' + alert)
+                    }
+                })
+            }
+
+            
+        })
 
     </script>
 
